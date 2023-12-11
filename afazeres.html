@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To do List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <nav>
+        <ul>                
+            <a href="index.html">Home</a>
+            <li><a href="afazeres.html">Afazeres</a></li>
+       </ul>
+   </nav>
+  </header>
+
+  <br> <br>
+
+  <main class="main">
+    <h1>To do list</h1>
+    <div class="maindiv">
+      <h1><span id="data"></span></h1>
+      <div class="divInput">
+        <input type="text" id="item" placeholder="Digite sua tarefa"><button id="enter">Enter</button>
+      </div>
+    </div>
+    <div class="to-do-list"></div>
+  </main>
+
+  <script>
+    const itemsArray = localStorage.getItem('items') ? JSON.parse(localStorage.getItem('items')) : [];
+    
+    document.querySelector("#enter").addEventListener("click", () => {
+      const item = document.querySelector("#item")
+      criarItem(item)
+    })
+
+    document.querySelector("#item").addEventListener("keypress", (e) => {
+      if(e.key === "Enter"){
+        const item = document.querySelector("#item")
+        criarItem(item)
+      }
+    })
+
+    function mostrarData(){
+      let data = new Date()
+      data = data.toString().split(" ")
+      data = data[1] + " " + data[2] + " " + data[3] 
+      document.querySelector("#data").innerHTML = data 
+    }
+
+    function mostrarItems(){
+      let items = ""
+      for(let i = 0; i < itemsArray.length; i++){
+        items += 
+        `<div class="item">
+          <div class="ctrlInp">
+            <textarea disabled>${itemsArray[i]}</textarea>
+          </div>
+          <div class="edit-controller">
+            <i class="fa-solid fa-check btDelete"></i>
+            <i class="fa-solid fa-pen-to-square btEdit"></i>
+          </div>
+          <div class="ctrlAtt">
+            <button class="salvar">Salvar</button>
+            <button class="cancelar">Cancelar</button>
+          </div>
+        </div>`
+      }
+      document.querySelector(".to-do-list").innerHTML = items
+      ativarDelete()
+      ativarEditores()
+      ativarSalvar()
+      ativarCanceladores()
+    }
+
+    function ativarDelete(){
+      let btDelete = document.querySelectorAll(".btDelete")
+      btDelete.forEach((dB, i) => {
+        dB.addEventListener("click", () => { deletarItem(i) })
+      })
+    }
+
+    function ativarEditores(){
+      const btEdit = document.querySelectorAll(".btEdit")
+      const ctrlAtualizar = document.querySelectorAll(".ctrlAtt")
+      const inputs = document.querySelectorAll(".ctrlInp textarea")
+      btEdit.forEach((eB, i) => {
+        eB.addEventListener("click", () => { 
+          ctrlAtualizar[i].style.display = "block"
+          inputs[i].disabled = false })
+      })
+    }
+
+    function ativarSalvar(){
+      const salvar = document.querySelectorAll(".salvar")
+      const inputs = document.querySelectorAll(".ctrlInp textarea")
+      salvar.forEach((sB, i) => {
+        sB.addEventListener("click", () => {
+          atualizarItem(inputs[i].value, i)
+        })
+      })
+    }
+
+    function ativarCanceladores(){
+      const cancelar = document.querySelectorAll(".cancelar")
+      const ctrlAtualizar = document.querySelectorAll(".ctrlAtt")
+      const inputs = document.querySelectorAll(".ctrlInp textarea")
+      cancelar.forEach((cB, i) => {
+        cB.addEventListener("click", () => {
+          ctrlAtualizar[i].style.display = "none"
+          inputs[i].disabled = true
+          inputs[i].style.border = "none"
+        })
+      })
+    }
+
+    function criarItem(item){
+      itemsArray.push(item.value)
+      localStorage.setItem('items', JSON.stringify(itemsArray))
+      location.reload()
+    }
+
+    function deletarItem(i){
+      itemsArray.splice(i,1)
+      localStorage.setItem('items', JSON.stringify(itemsArray))
+      location.reload()
+    }
+
+    function atualizarItem(text, i){
+      itemsArray[i] = text
+      localStorage.setItem('items', JSON.stringify(itemsArray))
+      location.reload()
+    }
+
+    window.onload = function() {
+      mostrarData()
+      mostrarItems()
+    }
+  </script>
+</body>
+</html>
